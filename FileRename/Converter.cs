@@ -11,106 +11,161 @@ using System.Windows.Data;
 
 namespace FileRename
 {
-    /// <summary>
-    /// 转换器命名空间
-    /// </summary>
     namespace Converter
     {
         /// <summary>
-        /// 自定义选中索引值与是否有选中项目的布尔值的转换器
+        /// 选中索引值与是否有选中项目的转换器。
         /// </summary>
         [ValueConversion(typeof(int), typeof(bool))]
-        public class SelectedIndexToSelected : IValueConverter
+        public class SelectedIndexToSelectedConverter : IValueConverter
         {
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                if ((int)value == -1) { return false; }
-                else { return true; }
-            }
+            /// <summary>
+            /// 选中索引值到是否有选中项目的转换。
+            /// </summary>
+            /// <param name="value"></param>
+            /// <param name="targetType"></param>
+            /// <param name="parameter"></param>
+            /// <param name="culture"></param>
+            /// <returns></returns>
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+                !((int)value == -1);
 
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                throw new NotImplementedException();
-            }
+            /// <summary>
+            /// 不支持此方法，总是抛出 <see cref="NotSupportedException"/> 异常。
+            /// </summary>
+            /// <param name="value"></param>
+            /// <param name="targetType"></param>
+            /// <param name="parameter"></param>
+            /// <param name="culture"></param>
+            /// <returns></returns>
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+                throw new NotSupportedException();
         }
 
         /// <summary>
-        /// 自定义项目数量与是否有项目的布尔值的转换器
+        /// 项目数量与是否有项目的反转的转换器。
         /// </summary>
         [ValueConversion(typeof(int), typeof(bool))]
-        public class ItemsCountToHasItems : IValueConverter
+        public class ItemsCountToHasItemsInvertedConverter : IValueConverter
         {
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                if ((int)value == 0) { return false; }
-                else { return true; }
-            }
+            /// <summary>
+            /// 项目数量到是否有项目的反转的转换。
+            /// </summary>
+            /// <param name="value"></param>
+            /// <param name="targetType"></param>
+            /// <param name="parameter"></param>
+            /// <param name="culture"></param>
+            /// <returns></returns>
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+                !((int)value == 0);
 
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                throw new NotImplementedException();
-            }
+            /// <summary>
+            /// 不支持此方法，总是抛出 <see cref="NotSupportedException"/> 异常。
+            /// </summary>
+            /// <param name="value"></param>
+            /// <param name="targetType"></param>
+            /// <param name="parameter"></param>
+            /// <param name="culture"></param>
+            /// <returns></returns>
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+                throw new NotSupportedException();
         }
 
         /// <summary>
-        /// 自定义整型逻辑到可见性的（反转的）转换器
+        /// 整型逻辑到可见性的反转的转换器。
         /// </summary>
         [ValueConversion(typeof(int), typeof(Visibility))]
-        public class IntLogicToVisibilityInverted : IValueConverter
+        public class IntLogicToVisibilityInvertedConverter : IValueConverter
         {
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                if ((int)value == 0) { return Visibility.Visible; }
-                else { return Visibility.Hidden; }
-            }
+            /// <summary>
+            /// 整型逻辑到可见性的反转的转换。
+            /// </summary>
+            /// <param name="value"></param>
+            /// <param name="targetType"></param>
+            /// <param name="parameter"></param>
+            /// <param name="culture"></param>
+            /// <returns></returns>
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+                ((int)value == 0) ? Visibility.Visible : Visibility.Hidden;
 
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                if ((Visibility)value == Visibility.Visible) { return 0; }
-                else { return 1; }
-            }
+            /// <summary>
+            /// 可见性到整型逻辑的反转的转换。
+            /// </summary>
+            /// <param name="value"></param>
+            /// <param name="targetType"></param>
+            /// <param name="parameter"></param>
+            /// <param name="culture"></param>
+            /// <returns></returns>
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+                ((Visibility)value == Visibility.Visible) ? 0 : 1;
         }
 
         /// <summary>
-        /// 命名规则到字符串的转换
+        /// 命名规则到命名规则名称的转换器。
         /// </summary>
-        [ValueConversion(typeof(NameRule.NameRuleType), typeof(string))]
-        public class RuleTypeToString : IValueConverter
+        [ValueConversion(typeof(NameRule.TypeCode), typeof(string))]
+        public class RuleTypeToStringConverter : IValueConverter
         {
+            /// <summary>
+            /// 命名规则到命名规则名称的转换。
+            /// </summary>
+            /// <param name="value"></param>
+            /// <param name="targetType"></param>
+            /// <param name="parameter"></param>
+            /// <param name="culture"></param>
+            /// <returns></returns>
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
-                switch ((NameRule.NameRuleType)(value))
+                switch ((NameRule.TypeCode)(value))
                 {
-                    case NameRule.NameRuleType.ConstantString: return "文本";
-                    case NameRule.NameRuleType.OrderNumber: return "数字";
-                    case NameRule.NameRuleType.HashCode: return "散列";
-                    case NameRule.NameRuleType.FileName: return "文件名";
-                    case NameRule.NameRuleType.Extension: return "扩展名";
+                    case NameRule.TypeCode.ConstantString: return "文本";
+                    case NameRule.TypeCode.OrderNumber: return "数字";
+                    case NameRule.TypeCode.HashCode: return "散列";
+                    case NameRule.TypeCode.FileName: return "文件名";
+                    case NameRule.TypeCode.Extension: return "扩展名";
                     default: return "";
                 }
             }
 
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                throw new NotImplementedException();
-            }
+            /// <summary>
+            /// 不支持此方法，总是抛出 <see cref="NotSupportedException"/> 异常。
+            /// </summary>
+            /// <param name="value"></param>
+            /// <param name="targetType"></param>
+            /// <param name="parameter"></param>
+            /// <param name="culture"></param>
+            /// <returns></returns>
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+                throw new NotSupportedException();
         }
 
         /// <summary>
-        /// 命名规则到索引的转换
+        /// 命名规则到命名规则索引值的转换器。
         /// </summary>
-        [ValueConversion(typeof(NameRule.NameRuleType), typeof(int))]
-        public class RuleTypeToIndex : IValueConverter
+        [ValueConversion(typeof(NameRule.TypeCode), typeof(int))]
+        public class RuleTypeToIndexConverter : IValueConverter
         {
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                return (int)((NameRule.NameRuleType)(value));
-            }
+            /// <summary>
+            /// 命名规则到命名规则索引值的转换。
+            /// </summary>
+            /// <param name="value"></param>
+            /// <param name="targetType"></param>
+            /// <param name="parameter"></param>
+            /// <param name="culture"></param>
+            /// <returns></returns>
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+                (int)((NameRule.TypeCode)(value));
 
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                return (NameRule.NameRuleType)((int)value);
-            }
+            /// <summary>
+            /// 命名规则索引值到命名规则的转换。
+            /// </summary>
+            /// <param name="value"></param>
+            /// <param name="targetType"></param>
+            /// <param name="parameter"></param>
+            /// <param name="culture"></param>
+            /// <returns></returns>
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+                (NameRule.TypeCode)((int)value);
         }
     }
 }

@@ -1,100 +1,53 @@
-﻿/// <summary>
-/// 可绑定数据类型BindableObject及对应列表变量的更新方法。
-/// </summary>
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace System.ComponentModel
 {
     /// <summary>
-    /// 可绑定对象，用于实现数据绑定到用户控件的抽象类。
+    /// <see cref="INotifyPropertyChanged"/> 接口的实现，用于实现数据绑定到用户控件的抽象类。
     /// </summary>
     public abstract class BindableObject : INotifyPropertyChanged
     {
         /// <summary>
-        /// 属性改变事件，当属性的set使用SetProperty(property, value)实现时触发。
+        /// 初始化 <see cref="BindableObject"/> 类的新实例。
+        /// </summary>
+        protected BindableObject() { }
+
+        /// <summary>
+        /// 属性改变事件，在属性值更改时发生。
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// 触发属性改变事件。
         /// </summary>
-        /// <param name="propertyName">属性名</param>
-        protected void OnPropertyChanged(string propertyName)
+        /// <param name="propertyName">已更改属性的名称。</param>
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            var propertyChanged = PropertyChanged;
-            if (propertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         /// <summary>
-        /// 改变属性时使用的方法。
+        /// 更改属性的值，并通知客户端属性发生更改。
         /// </summary>
-        /// <typeparam name="T">类型</typeparam>
-        /// <param name="item">属性对应的字段名</param>
-        /// <param name="value">填入value</param>
-        /// <param name="propertyName">属性名（由编译器自动获取）</param>
-        /// <example>
-        /// public var Property { get => property; set => SetProperty(property, value); }
-        /// </example>
-        protected void SetProperty<T>(ref T item, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        /// <remarks>
+        /// 请在属性的 <see langword="set"/> 处调用此方法，
+        /// 在更改属性值的同时触发 <see cref="INotifyPropertyChanged.PropertyChanged"/> 事件。
+        /// </remarks>
+        /// <typeparam name="T">属性的类型。</typeparam>
+        /// <param name="item">属性对应的字段。</param>
+        /// <param name="value">属性的新值，一般为 <see langword="value"/> 关键字。</param>
+        /// <param name="propertyName">属性的名称，由编译器自动获取。</param>
+        protected void SetProperty<T>(ref T item, T value,
+            [CallerMemberName] string propertyName = null)
         {
-            if (!System.Collections.Generic.EqualityComparer<T>.Default.Equals(item, value))
+            if (!EqualityComparer<T>.Default.Equals(item, value))
             {
                 item = value;
-                OnPropertyChanged(propertyName);
+                this.OnPropertyChanged(propertyName);
             }
-        }
-    }
-}
-
-namespace System.Collections.Generic
-{
-    /// <summary>
-    /// 实现List的PropertyChanged事件触发，变量必须实现INotifyPropertyChanged接口。
-    /// </summary>
-    public abstract class BindableListUpdate
-    {
-        /// <summary>
-        /// 触发PropertyChanged事件，以实现更新绑定目标。
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="list">要触发更新的列表变量List</param>
-        /// <returns>要触发更新的列表变量List</returns>
-        public static List<T> Update<T>(List<T> list)
-        {
-            T[] items = new T[list.Count];
-            list.CopyTo(items);
-            list.Clear();
-            List<T> tempList = new List<T>();
-            foreach (var item in items)
-            { tempList.Add(item); }
-            return tempList;
-        }
-    }
-}
-
-namespace System.Collections
-{
-    /// <summary>
-    /// 实现ArrayList的PropertyChanged事件触发，变量必须实现INotifyPropertyChanged接口。
-    /// </summary>
-    public abstract class BindableArrayListUpdate
-    {
-        /// <summary>
-        /// 触发PropertyChanged事件，以实现更新绑定目标。
-        /// </summary>
-        /// <param name="list">要触发更新的数组列表变量ArrayList</param>
-        /// <returns>要触发更新的数组列表变量ArrayList</returns>
-        public static ArrayList Update(ArrayList list)
-        {
-            Array items = new Array[list.Count];
-            list.CopyTo(items);
-            list.Clear();
-            ArrayList tempList = new ArrayList();
-            foreach (var item in items)
-            { tempList.Add(item); }
-            return tempList;
         }
     }
 }

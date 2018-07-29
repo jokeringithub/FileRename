@@ -24,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Debug\FileRename.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,6 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Release\FileRename.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>FileRename.ico</ApplicationIcon>
@@ -59,11 +61,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FileHash.FileHashParallel.cs" />
-    <Compile Include="FileHash.FileHashParallel.FileHash.cs" />
-    <Compile Include="System.ComponentModel.BindableObject.cs" />
-    <Compile Include="System.EnumerableConcat.cs" />
-    <Compile Include="System.IO.AllFilePaths.cs" />
+    <Compile Include="Bindable.cs" />
+    <Compile Include="BindableObject.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -72,9 +71,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FileHashParallel.cs" />
+    <Compile Include="FileHashParallel.FileHash.cs" />
     <Compile Include="FileRenameInfo.cs" />
     <Compile Include="Converter.cs" />
-    <Compile Include="FileNewName.cs" />
+    <Compile Include="NewFilename.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

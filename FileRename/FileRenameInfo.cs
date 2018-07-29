@@ -11,188 +11,170 @@ namespace FileRename
     /// <summary>
     /// 文件信息类，仅提供与文件重命名有关的文件信息
     /// </summary>
-    public class FileRenameInfo : BindableObject
+    public class FileRenameInfo : BindableObject, IEquatable<FileRenameInfo>
     {
         /// <summary>
-        /// 使用FileInfo类实例化此类
+        /// 指示是否被选中。
         /// </summary>
-        /// <param name="fileInfo">FileInfo类实例</param>
+        private bool selected;
+        /// <summary>
+        /// 新文件名。
+        /// </summary>
+        private string newName;
+        /// <summary>
+        /// 指示文件重命名是否完成。
+        /// </summary>
+        private bool renameCompleted;
+
+        /// <summary>
+        /// 使用 <see cref="FileInfo"/> 实例初始化此类。
+        /// </summary>
+        /// <param name="fileInfo"><see cref="FileInfo"/> 实例。</param>
         public FileRenameInfo(FileInfo fileInfo)
         {
-            InitializeFileRenameInfo(fileInfo);
+            this.selected = true;
+            this.Name = fileInfo.Name;
+            this.Extension = fileInfo.Extension;
+            this.FullName = fileInfo.FullName;
+            this.Directory = fileInfo.DirectoryName;
+            this.renameCompleted = false;
+            this.Size = fileInfo.Length;
+            this.UpdateTime = fileInfo.LastWriteTime;
         }
 
         /// <summary>
-        /// 使用文件路径实例化此类
+        /// 使用文件路径初始化此类。
         /// </summary>
-        /// <param name="fileFullName">文件路径，无法打开则创建一个占位符</param>
+        /// <param name="filePath">文件路径，无法打开则创建一个占位符。</param>
         /// <exception cref="FileNotFoundException"></exception>
-        public FileRenameInfo(string fileFullName)
+        public FileRenameInfo(string filePath)
         {
             try
             {
-                InitializeFileRenameInfo(new FileInfo(fileFullName));
+                var fileInfo = new FileInfo(filePath);
+                this.selected = true;
+                this.Name = fileInfo.Name;
+                this.Extension = fileInfo.Extension;
+                this.FullName = fileInfo.FullName;
+                this.Directory = fileInfo.DirectoryName;
+                this.renameCompleted = false;
+                this.Size = fileInfo.Length;
+                this.UpdateTime = fileInfo.LastWriteTime;
             }
             catch (Exception)
             {
-                InitializeDummyFileRenameInfo();
+                this.selected = true;
+                this.Name = "***";
+                this.Extension = string.Empty;
+                this.FullName = string.Empty;
+                this.Directory = string.Empty;
+                this.renameCompleted = false;
+                this.Size = 0;
+                this.UpdateTime = new DateTime();
             }
         }
 
         /// <summary>
-        /// 使用FileInfo执行初始化
+        /// 指示是否被选中。
         /// </summary>
-        /// <param name="fileInfo">文件的FileInfo</param>
-        private void InitializeFileRenameInfo(FileInfo fileInfo)
+        public bool Selected
         {
-            selected = true;
-            fileName = fileInfo.Name;
-            fileExtension = fileInfo.Extension;
-            filePath = fileInfo.FullName;
-            fileDirectory = fileInfo.DirectoryName;
-            fileRenameCompleted = false;
-            fileSize = fileInfo.Length;
-            fileUpdateTime = fileInfo.LastWriteTime;
+            get => this.selected;
+            set => this.SetProperty(ref this.selected, value);
         }
-
         /// <summary>
-        /// 初始化一个占位实例
+        /// 文件名。
         /// </summary>
-        private void InitializeDummyFileRenameInfo()
-        {
-            selected = true;
-            fileName = "***";
-            fileExtension = string.Empty;
-            filePath = string.Empty;
-            fileDirectory = string.Empty;
-            fileRenameCompleted = false;
-            fileSize = 0;
-            fileUpdateTime = new DateTime();
-        }
-
+        public string Name { get; }
         /// <summary>
-        /// 判断是否为同一文件
+        /// 文件扩展名。
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override bool Equals(object obj)
-        {
-            //       
-            // See the full list of guidelines at
-            //   http://go.microsoft.com/fwlink/?LinkID=85237  
-            // and also the guidance for operator== at
-            //   http://go.microsoft.com/fwlink/?LinkId=85238
-            //
-
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-            else if (((FileRenameInfo)obj).FilePath != this.filePath)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
+        public string Extension { get; }
         /// <summary>
-        /// 生成基于文件路径的散列值
+        /// 文件所在目录。
         /// </summary>
-        /// <returns></returns>
-        public override int GetHashCode()
-        {
-            return -1223983128 + EqualityComparer<string>.Default.GetHashCode(fileName);
-        }
-
-        private bool selected;
+        public string Directory { get; }
         /// <summary>
-        /// 指示是否被选中
+        /// 文件完整路径。
         /// </summary>
-        public bool Selected { get => selected;  set => SetProperty(ref selected, value); }
-
-        private string fileName;
+        public string FullName { get; }
         /// <summary>
-        /// 文件名字符串
+        /// 文件大小，单位 Byte。
         /// </summary>
-        public string FileName { get => fileName;  }
-
-        private string fileExtension;
+        public long Size { get; }
         /// <summary>
-        /// 文件扩展名
+        /// 文件大小的字符串，会自动转换为 KB, MB, GB 等单位。
         /// </summary>
-        public string FileExtension { get => fileExtension; }
-
-        private string fileDirectory;
-        /// <summary>
-        /// 文件所在目录
-        /// </summary>
-        public string FileDirectory { get => fileDirectory; }
-
-        private string fileNewName;
-        /// <summary>
-        /// 新文件名字符串
-        /// </summary>
-        public string FileNewName { get => fileNewName; set => SetProperty(ref fileNewName, value); }
-
-        private string filePath;
-        /// <summary>
-        /// 文件完整绝对路径
-        /// </summary>
-        public string FilePath { get => filePath; }
-
-        /// <summary>
-        /// 文件重命名后的新路径
-        /// </summary>
-        public string FileNewPath { get => fileDirectory + @"\" + fileNewName; }
-
-        private bool fileRenameCompleted;
-        /// <summary>
-        /// 指示文件重命名是否完成
-        /// </summary>
-        public bool FileRenameCompleted { get => fileRenameCompleted; set => SetProperty(ref fileRenameCompleted, value); }
-
-        private long fileSize;
-        /// <summary>
-        /// 文件大小，单位Byte
-        /// </summary>
-        public long FileSize { get => fileSize; }
-        /// <summary>
-        /// 文件大小的字符串，会自动转换为KB, MB, GB为单位
-        /// </summary>
-        public string FileSizeString
+        public string SizeString
         {
             get
             {
-                if (fileSize < Math.Pow(1024, 2))
+                if (Size < Math.Pow(1024, 2))
                 {
-                    return Math.Round((fileSize / Math.Pow(1024, 1)), 2).ToString() + " KB";
+                    return Math.Round((Size / Math.Pow(1024, 1)), 2).ToString() + " KB";
                 }
-                else if (fileSize < Math.Pow(1024, 3))
+                else if (Size < Math.Pow(1024, 3))
                 {
-                    return Math.Round((fileSize / Math.Pow(1024, 2)), 2).ToString() + " MB";
+                    return Math.Round((Size / Math.Pow(1024, 2)), 2).ToString() + " MB";
                 }
-                else if (fileSize < Math.Pow(1024, 4))
+                else if (Size < Math.Pow(1024, 4))
                 {
-                    return Math.Round((fileSize / Math.Pow(1024, 3)), 2).ToString() + " GB";
+                    return Math.Round((Size / Math.Pow(1024, 3)), 2).ToString() + " GB";
                 }
                 else
                 {
-                    return Math.Round((fileSize / Math.Pow(1024, 4)), 2).ToString() + " TB";
+                    return Math.Round((Size / Math.Pow(1024, 4)), 2).ToString() + " TB";
                 }
             }
         }
+        /// <summary>
+        /// 文件修改日期。
+        /// </summary>
+        public DateTime UpdateTime { get; }
+        /// <summary>
+        /// 文件修改日期字符串，格式为 "短日期 短时间"。
+        /// </summary>
+        public string UpdateTimeString
+        {
+            get =>
+                this.UpdateTime.ToShortDateString() +
+                " " +
+                this.UpdateTime.ToShortTimeString();
+        }
+        /// <summary>
+        /// 新文件名。
+        /// </summary>
+        public string NewName { get => this.newName; set => this.SetProperty(ref this.newName, value); }
+        /// <summary>
+        /// 文件重命名后的新路径。
+        /// </summary>
+        public string NewFullName { get => this.Directory + @"\" + this.newName; }
+        /// <summary>
+        /// 指示文件重命名是否完成。
+        /// </summary>
+        public bool RenameCompleted { get => this.renameCompleted; set => this.SetProperty(ref this.renameCompleted, value); }
 
-        private DateTime fileUpdateTime;
         /// <summary>
-        /// 文件修改日期
+        /// 判断是否为同一文件。
         /// </summary>
-        public DateTime FileUpdateTime { get => fileUpdateTime; }
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(FileRenameInfo other) =>
+            StringComparer.CurrentCultureIgnoreCase.Equals(this.FullName, other.FullName);
+
         /// <summary>
-        /// 文件修改日期字符串，格式为"短日期 短时间"
+        /// 判断是否为同一文件。
         /// </summary>
-        public string FileUpdateTimeString { get => fileUpdateTime.ToShortDateString() + " " + fileUpdateTime.ToShortTimeString(); }
-    }
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj) =>
+            (obj is FileRenameInfo fileRenameInfo) && this.Equals(fileRenameInfo);
+
+        /// <summary>
+        /// 生成基于文件路径的散列值。
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode() => 
+            -1223983128 + StringComparer.CurrentCultureIgnoreCase.GetHashCode(FullName);
+   }
 }

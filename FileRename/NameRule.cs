@@ -8,106 +8,172 @@ using System.Threading.Tasks;
 namespace FileRename
 {
     /// <summary>
-    /// 文件重命名的命名规则类
+    /// 文件重命名的命名规则类。
     /// </summary>
-    public class NameRule : BindableObject
+    public partial class NameRule : BindableObject
     {
         /// <summary>
-        /// 使用类型初始化命名规则类
+        /// 命名规则类型。
         /// </summary>
-        /// <param name="ruleType">命名规则类型</param>
-        public NameRule(NameRuleType ruleType)
+        private NameRule.TypeCode ruleType;
+        /// <summary>
+        /// 固定字符串。
+        /// </summary>
+        private string constantString;
+        /// <summary>
+        /// 编号数字长度，为空或 0 则为可变长度。
+        /// </summary>
+        private int numberLength;
+        /// <summary>
+        /// 起始编号，为空则默认为 0。
+        /// </summary>
+        private string startNumberString;
+        /// <summary>
+        /// 结束编号，为空则默认最大。
+        /// </summary>
+        private string endNumberString;
+        /// <summary>
+        /// 标识被选中的散列值。
+        /// </summary>
+        private bool[] hashSelected;
+        /// <summary>
+        /// 原文件名起始索引，为空默认为 0（对用户而言为 1）。
+        /// </summary>
+        private string startIndexString;
+        /// <summary>
+        /// 原文件名结束索引，为空默认到结尾。
+        /// </summary>
+        private string endIndexString;
+        /// <summary>
+        /// 指示是否使用自定义扩展名。
+        /// </summary>
+        private bool isCustomExtension;
+        /// <summary>
+        /// 自定义扩展名。
+        /// </summary>
+        private string customExtension;
+
+        /// <summary>
+        /// 使用命名规则类型 <see cref="NameRule.TypeCode"/> 初始化 <see cref="NameRule"/> 的实例。
+        /// </summary>
+        /// <param name="ruleType">命名规则类型。</param>
+        public NameRule(NameRule.TypeCode ruleType)
         {
             this.ruleType = ruleType;
-            constantString = string.Empty;
-            hashCodeSelected = new bool[6];
+            this.constantString = string.Empty;
+            this.hashSelected = new bool[6];
+            this.hashSelected[2] = true;
         }
 
-        private NameRuleType ruleType;
         /// <summary>
-        /// 命名规则类型
+        /// 命名规则类型。
         /// </summary>
-        public NameRuleType RuleType { get => ruleType; set => SetProperty(ref ruleType, value); }
+        public NameRule.TypeCode RuleType
+        {
+            get => this.ruleType;
+            set => this.SetProperty(ref this.ruleType, value);
+        }
+        /// <summary>
+        /// 固定字符串。
+        /// </summary>
+        public string ConstantString
+        {
+            get => this.constantString;
+            set => this.SetProperty(ref this.constantString, value);
+        }
+        /// <summary>
+        /// 编号数字长度，为空或 0 则为可变长度。
+        /// </summary>
+        public int NumberLength
+        {
+            get => this.numberLength;
+            set => this.SetProperty(ref this.numberLength, value);
+        }
+        /// <summary>
+        /// 起始编号，为空则默认为 0。
+        /// </summary>
+        public string StartNumberString
+        {
+            get => this.startNumberString;
+            set => this.SetProperty(ref this.startNumberString, value);
+        }
+        /// <summary>
+        /// 结束编号，为空则默认最大。
+        /// </summary>
+        public string EndNumberString
+        {
+            get => this.endNumberString;
+            set => this.SetProperty(ref this.endNumberString, value);
+        }
+        /// <summary>
+        /// 标识被选中的散列值。
+        /// </summary>
+        public bool[] HashSelected
+        {
+            get => this.hashSelected;
+            set => this.SetProperty(ref this.hashSelected, value);
+        }
+        /// <summary>
+        /// 原文件名起始索引，为空默认为 0（对用户而言为 1）。
+        /// </summary>
+        public string StartIndexString
+        {
+            get => this.startIndexString;
+            set => this.SetProperty(ref this.startIndexString, value);
+        }
+        /// <summary>
+        /// 原文件名结束索引，为空默认到结尾。
+        /// </summary>
+        public string EndIndexString
+        {
+            get => this.endIndexString;
+            set => this.SetProperty(ref this.endIndexString, value);
+        }
+        /// <summary>
+        /// 指示是否使用自定义扩展名。
+        /// </summary>
+        public bool IsCustomExtension
+        {
+            get => this.isCustomExtension;
+            set => this.SetProperty(ref this.isCustomExtension, value);
+        }
+        /// <summary>
+        /// 自定义扩展名。
+        /// </summary>
+        public string CustomExtension
+        {
+            get => this.customExtension;
+            set => this.SetProperty(ref this.customExtension, value);
+        }
+    }
 
+    public partial class NameRule
+    {
         /// <summary>
-        /// 用于指定命名规则的枚举类
+        /// 用于指定命名规则的枚举类。
         /// </summary>
-        public enum NameRuleType
+        public enum TypeCode
         {
             /// <summary>
-            /// 固定的字符串
+            /// 固定的字符串。
             /// </summary>
             ConstantString,
             /// <summary>
-            /// 顺序数
+            /// 顺序数。
             /// </summary>
             OrderNumber,
             /// <summary>
-            /// 文件散列
+            /// 文件散列。
             /// </summary>
             HashCode,
             /// <summary>
-            /// 来自原文件名
+            /// 来自原文件名。
             /// </summary>
             FileName,
             /// <summary>
-            /// 文件扩展名
+            /// 文件扩展名。
             /// </summary>
-            Extension,
+            Extension
         }
-
-        private string constantString;
-        /// <summary>
-        /// 用于NameRuleType.ConstantString的属性
-        /// </summary>
-        public string ConstantString { get => constantString; set => SetProperty(ref constantString, value); }
-
-        private int numberLength;
-        /// <summary>
-        /// 编号数字长度，为空或0则为可变长度
-        /// </summary>
-        public int NumberLength { get => numberLength; set => SetProperty(ref numberLength, value); }
-
-        private string startNumber;
-        /// <summary>
-        /// 起始编号，为空则默认为0
-        /// </summary>
-        public string StartNumber { get => startNumber; set => SetProperty(ref startNumber, value); }
-
-        private string endNumber;
-        /// <summary>
-        /// 结束编号，为空则默认最大
-        /// </summary>
-        public string EndNumber { get => endNumber; set => SetProperty(ref endNumber, value); }
-
-        private bool[] hashCodeSelected;
-        /// <summary>
-        /// 标识被选中的散列值
-        /// </summary>
-        public bool[] HashCodeSelected { get => hashCodeSelected; set => SetProperty(ref hashCodeSelected, value); }
-
-        private string startIndex;
-        /// <summary>
-        /// 原文件名起始索引，为空默认为0（对用户而言为1）
-        /// </summary>
-        public string StartIndex { get => startIndex; set => SetProperty(ref startIndex, value); }
-
-        private string endIndex;
-        /// <summary>
-        /// 原文件名结束索引，为空默认到结尾
-        /// </summary>
-        public string EndIndex { get => endIndex; set => SetProperty(ref endIndex, value); }
-
-        private bool isCustomExtension;
-        /// <summary>
-        /// 指示是否使用自定义扩展名
-        /// </summary>
-        public bool IsCustomExtension { get => isCustomExtension; set => SetProperty(ref isCustomExtension, value); }
-
-        private string customExtension;
-        /// <summary>
-        /// 自定义扩展名
-        /// </summary>
-        public string CustomExtension { get => customExtension; set => SetProperty(ref customExtension, value); }
     }
 }
