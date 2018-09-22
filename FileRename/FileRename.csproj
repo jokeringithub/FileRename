@@ -74,7 +74,7 @@
     <Compile Include="FileHashParallel.cs" />
     <Compile Include="FileHashParallel.FileHash.cs" />
     <Compile Include="FileRenameInfo.cs" />
-    <Compile Include="Converter.cs" />
+    <Compile Include="Converters.cs" />
     <Compile Include="NewFilename.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

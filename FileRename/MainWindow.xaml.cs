@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using XstarS.ComponentModel;
 
 namespace FileRename
 {
@@ -25,7 +26,7 @@ namespace FileRename
         {
             this.NameRuleList = new BindingList<NameRule>();
             this.FileRenameInfoList = new BindingList<FileRenameInfo>();
-            this.RecurseSubdirectories = new Bindable<bool>();
+            this.RecurseSubdirectories = false;
             this.InitializeParameter();
             this.InitializeComponent();
         }

@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace System.ComponentModel
+namespace XstarS.ComponentModel
 {
     /// <summary>
     /// <see cref="INotifyPropertyChanged"/> 接口的实现，用于实现数据绑定到用户控件的泛型类。
-    /// 此类不能被继承。
     /// </summary>
     /// <remarks><para>
     /// 设置数据绑定时，请绑定到 <see cref="Bindable{T}.Value"/>，而非实例本身，以实现属性值发生更改时通知客户端。
@@ -17,7 +16,7 @@ namespace System.ComponentModel
     /// 并会替换 <see cref="INotifyPropertyChanged.PropertyChanged"/> 事件委托，破坏绑定关系。
     /// </para></remarks>
     /// <typeparam name="T"><see cref="Bindable{T}"/> 中用于数据绑定的值的类型。</typeparam>
-    public sealed class Bindable<T> : BindableObject, IEquatable<Bindable<T>>
+    public class Bindable<T> : BindableObject, IEquatable<Bindable<T>>
     {
         /// <summary>
         /// 当前 <see cref="Bindable{T}"/> 实例用于数据绑定的值。
@@ -27,13 +26,13 @@ namespace System.ComponentModel
         /// <summary>
         /// 使用默认值初始化 <see cref="Bindable{T}"/> 类的新实例。
         /// </summary>
-        public Bindable() => this.value = default(T);
+        public Bindable() : base() => this.value = default(T);
 
         /// <summary>
         /// 使用指定的值初始化 <see cref="Bindable{T}"/> 类的新实例。
         /// </summary>
         /// <param name="value">一个 <typeparamref name="T"/> 类型的对象。</param>
-        public Bindable(T value) => this.value = value;
+        public Bindable(T value) : base() => this.value = value;
 
         /// <summary>
         /// 当前 <see cref="Bindable{T}"/> 实例用于数据绑定的值。
@@ -57,8 +56,7 @@ namespace System.ComponentModel
         /// 则为 <see langword="true"/>；否则为 <see langword="false"/>。
         /// </returns>
         public bool Equals(Bindable<T> other) =>
-            !(other is null) &&
-            EqualityComparer<T>.Default.Equals(this.value, other.value);
+            !(other is null) && EqualityComparer<T>.Default.Equals(this.value, other.value);
 
         /// <summary>
         /// 返回一个值，该值指示此实例和指定的对象是否表示相同的值。
@@ -97,6 +95,7 @@ namespace System.ComponentModel
         /// </returns>
         public static bool operator ==(Bindable<T> bindable1, Bindable<T> bindable2) =>
             EqualityComparer<Bindable<T>>.Default.Equals(bindable1, bindable2);
+
         /// <summary>
         /// 指示两 <see cref="Bindable{T}"/> 对象是否不等。
         /// </summary>
@@ -116,6 +115,7 @@ namespace System.ComponentModel
         /// <param name="value">一个 <typeparamref name="T"/> 类型的对象。</param>
         /// <returns>使用 <paramref name="value"/> 初始化的 <see cref="Bindable{T}"/> 对象。</returns>
         public static implicit operator Bindable<T>(T value) => new Bindable<T>(value);
+
         /// <summary>
         /// 返回指定 <see cref="Bindable{T}"/> 对象用于数据绑定的值。
         /// </summary>

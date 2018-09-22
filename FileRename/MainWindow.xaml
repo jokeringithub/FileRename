@@ -4,17 +4,17 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:FileRename"
-    xmlns:converter="clr-namespace:FileRename.Converter" 
+    xmlns:converters="clr-namespace:FileRename.Converters" 
     x:Name="mainWindow"
     x:Class="FileRename.MainWindow"
         mc:Ignorable="d"
         Title="文件批量重命名" Height="600" Width="800" FontSize="14" ResizeMode="CanResize" MinWidth="640" MinHeight="480" KeyDown="MainWindow_KeyDown" Icon="FileRename.ico">
     <Window.Resources>
-        <converter:SelectedIndexToSelectedConverter x:Key="SelectedIndexToSelectedConverter"/>
-        <converter:ItemsCountToHasItemsInvertedConverter x:Key="ItemsCountToHasItemsInvertedConverter"/>
-        <converter:IntLogicToVisibilityInvertedConverter x:Key="IntLogicToVisibilityInvertedConverter"/>
-        <converter:RuleTypeToStringConverter x:Key="RuleTypeToStringConverter"/>
-        <converter:RuleTypeToIndexConverter x:Key="RuleTypeToIndexConverter"/>
+        <converters:SelectedIndexToSelectedConverter x:Key="SelectedIndexToSelectedConverter"/>
+        <converters:ItemsCountToHasItemsInvertedConverter x:Key="ItemsCountToHasItemsInvertedConverter"/>
+        <converters:IntLogicToVisibilityInvertedConverter x:Key="IntLogicToVisibilityInvertedConverter"/>
+        <converters:RuleTypeToStringConverter x:Key="RuleTypeToStringConverter"/>
+        <converters:RuleTypeToIndexConverter x:Key="RuleTypeToIndexConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -36,7 +36,7 @@
             </DataGrid.Columns>
         </DataGrid>
         <Label Content="规则列表" Margin="10,10,70,0" Height="30" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
-        <Button x:Name="addRuleButton" Content="添加" Margin="80,10,10,0" VerticalAlignment="Top" Click="AddRuleButton_Click" Height="30" RenderTransformOrigin="0.463,0.3"/>
+        <Button Content="添加" Margin="80,10,10,0" VerticalAlignment="Top" Click="AddRuleButton_Click" Height="30" RenderTransformOrigin="0.463,0.3"/>
         <ListBox x:Name="ruleListBox" ItemsSource="{Binding NameRuleList, ElementName=mainWindow}" Margin="10,45,10,10" IsSynchronizedWithCurrentItem="True">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -44,13 +44,13 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Button x:Name="browseFileButton" Content="浏览" Height="30" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Width="60" VerticalAlignment="Top" Click="BrowseFileButton_Click" Margin="10,0,0,0"/>
+        <Button Content="浏览" Height="30" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Width="60" VerticalAlignment="Top" Click="BrowseFileButton_Click" Margin="10,0,0,0"/>
         <Label Content="可将文件或文件夹拖入框中" Grid.Column="1" VerticalContentAlignment="Center" VerticalAlignment="Center" Height="30" HorizontalAlignment="Center" Visibility="{Binding Items.Count, Converter={StaticResource IntLogicToVisibilityInvertedConverter}, ElementName=fileInfoDataGrid, Mode=OneWay}"/>
-        <CheckBox x:Name="subdirectoryCheckBox" Content="包含子目录" Grid.Column="1" HorizontalAlignment="Left" Margin="75,0,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="30" Grid.Row="1" IsChecked="{Binding RecurseSubdirectories.Value, ElementName=mainWindow}"/>
-        <Button x:Name="fileInfoDeleteButton" Content="删除" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,80,0" VerticalAlignment="Top" Width="60" Height="30" Grid.Row="1" IsEnabled="{Binding SelectedIndex, Converter={StaticResource SelectedIndexToSelectedConverter}, ElementName=fileInfoDataGrid, Mode=OneWay}" Click="FileInfoDeleteButton_Click"/>
-        <Button x:Name="fileListClearButton" Content="清空" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Top" Width="60" Height="30" Click="FileListClearButton_Click" Grid.Row="1" IsEnabled="{Binding Items.Count, Converter={StaticResource ItemsCountToHasItemsInvertedConverter}, ElementName=fileInfoDataGrid, Mode=OneWay}"/>
-        <Button x:Name="dummyAddButton" Content="添加占位符" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,150,0" Grid.Row="1" VerticalAlignment="Top" Width="100" Height="30" Click="DummyAddButton_Click"/>
-        <TabControl x:Name="ruleTypeTabControl" Margin="10,0,10,10" Grid.Row="2" Grid.ColumnSpan="3" SelectedIndex="{Binding SelectedItem.RuleType, Converter={StaticResource RuleTypeToIndexConverter}, ElementName=ruleListBox}">
+        <CheckBox Content="包含子目录" Grid.Column="1" HorizontalAlignment="Left" Margin="75,0,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="30" Grid.Row="1" IsChecked="{Binding RecurseSubdirectories.Value, ElementName=mainWindow}"/>
+        <Button Content="删除" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,80,0" VerticalAlignment="Top" Width="60" Height="30" Grid.Row="1" IsEnabled="{Binding SelectedIndex, Converter={StaticResource SelectedIndexToSelectedConverter}, ElementName=fileInfoDataGrid, Mode=OneWay}" Click="FileInfoDeleteButton_Click"/>
+        <Button Content="清空" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Top" Width="60" Height="30" Click="FileListClearButton_Click" Grid.Row="1" IsEnabled="{Binding Items.Count, Converter={StaticResource ItemsCountToHasItemsInvertedConverter}, ElementName=fileInfoDataGrid, Mode=OneWay}"/>
+        <Button Content="添加占位符" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,150,0" Grid.Row="1" VerticalAlignment="Top" Width="100" Height="30" Click="DummyAddButton_Click"/>
+        <TabControl Margin="10,0,10,10" Grid.Row="2" Grid.ColumnSpan="3" SelectedIndex="{Binding SelectedItem.RuleType, Converter={StaticResource RuleTypeToIndexConverter}, ElementName=ruleListBox}">
             <TabItem Header="文本" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="67">
                 <Grid Background="#FFE5E5E5">
                     <TextBox Margin="10,15,10,0" MaxLines="1" TextWrapping="Wrap" Text="{Binding SelectedItem.ConstantString, ElementName=ruleListBox}" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
@@ -93,8 +93,8 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button x:Name="deleteRuleButton" Content="删除" HorizontalAlignment="Right" Margin="0,0,10,75" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="2" IsEnabled="{Binding SelectedIndex, Converter={StaticResource SelectedIndexToSelectedConverter}, ElementName=ruleListBox}" Click="DeleteRuleButton_Click" Width="60" Height="25"/>
-        <Button x:Name="runButton" Content="执行" Margin="80,0,10,0" Grid.Row="1" VerticalAlignment="Top" Height="30" Click="RunButton_Click"/>
-        <Button x:Name="applyButton" Content="应用" Margin="10,0,80,0" Grid.Row="1" VerticalAlignment="Top" Height="30" Click="ApplyButton_Click"/>
+        <Button Content="删除" HorizontalAlignment="Right" Margin="0,0,10,75" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="2" IsEnabled="{Binding SelectedIndex, Converter={StaticResource SelectedIndexToSelectedConverter}, ElementName=ruleListBox}" Click="DeleteRuleButton_Click" Width="60" Height="25"/>
+        <Button Content="执行" Margin="80,0,10,0" Grid.Row="1" VerticalAlignment="Top" Height="30" Click="RunButton_Click"/>
+        <Button Content="应用" Margin="10,0,80,0" Grid.Row="1" VerticalAlignment="Top" Height="30" Click="ApplyButton_Click"/>
     </Grid>
 </Window>
