@@ -61,8 +61,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Bindable.cs" />
-    <Compile Include="BindableObject.cs" />
+    <Compile Include="BindingBase\Bindable.cs" />
+    <Compile Include="BindingBase\BindableObject.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -71,10 +71,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FileHashParallel.cs" />
-    <Compile Include="FileHashParallel.FileHash.cs" />
+    <Compile Include="FileHash\FileHashCompute.cs" />
+    <Compile Include="FileHash\FileHashParallel.cs" />
     <Compile Include="FileRenameInfo.cs" />
     <Compile Include="Converters.cs" />
+    <Compile Include="FileHash\HashType.cs" />
     <Compile Include="NewFilename.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

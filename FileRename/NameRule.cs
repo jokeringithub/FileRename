@@ -62,7 +62,7 @@ namespace FileRename
             this.ruleType = ruleType;
             this.constantString = string.Empty;
             this.hashSelected = new bool[6];
-            this.hashSelected[2] = true;
+            this.hashSelected[1] = true;
         }
 
         /// <summary>

@@ -8,19 +8,15 @@ using System.Threading;
 namespace FileHash
 {
     /// <summary>
-    /// 并行计算文件散列值类，依赖 <see cref="FileHashParallel.FileHash"/> 类。
+    /// 并行计算文件散列值类，依赖 <see cref="FileHashCompute"/> 类。
     /// </summary>
     public partial class FileHashParallel : IDisposable
     {
         /// <summary>
         /// 获取允许计算的散列值的类型数量
         /// </summary>
-        public static readonly int HashTypeCount = FileHash.HashTypeCount;
+        public static readonly int HashTypeCount = FileHashCompute.HashTypeCount;
 
-        /// <summary>
-        /// 传入的文件路径。
-        /// </summary>
-        private readonly string filePath;
         /// <summary>
         /// 计算散列值的标志向量。
         /// </summary>
@@ -36,7 +32,7 @@ namespace FileHash
         /// <summary>
         /// 计算散列类的数组。
         /// </summary>
-        private FileHash[] fileHashes;
+        private FileHashCompute[] fileHashes;
         /// <summary>
         /// 计算文件散列的文件流数组。
         /// </summary>
@@ -45,6 +41,10 @@ namespace FileHash
         /// 散列计算用线程。
         /// </summary>
         private Thread[] fileHashComputeThreads;
+        /// <summary>
+        /// 指示此实例的资源是否已经被释放。
+        /// </summary>
+        private bool isDisposed;
 
         /// <summary>
         /// 使用文件路径和计算散列值的标志向量初始化 <see cref="FileHashParallel"/> 的实例。
@@ -60,9 +60,10 @@ namespace FileHash
                 throw new ArgumentException();
             }
 
-            this.filePath = filePath;
+            this.FilePath = filePath;
             this.fileHashEnables = fileHashEnables;
             this.fileHashList = new List<byte[]>();
+            this.isDisposed = false;
 
             this.IsStarted = false;
             this.IsCompleted = false;
@@ -81,7 +82,7 @@ namespace FileHash
         /// <summary>
         /// 传入的文件路径。
         /// </summary>
-        public string FilePath { get => this.filePath; }
+        public string FilePath { get; }
         /// <summary>
         /// 指示计算是否已经开始。
         /// </summary>
@@ -158,7 +159,7 @@ namespace FileHash
         }
 
         /// <summary>
-        /// 创建打开单一文件的文件流数组
+        /// 创建打开单一文件的文件流数组。
         /// </summary>
         /// <exception cref="FileNotFoundException"></exception>
         private FileStream[] CreatFileStreams(string filePath, int count)
@@ -184,16 +185,16 @@ namespace FileHash
         /// <exception cref="FileNotFoundException"></exception>
         private void Compute()
         {
-            // 初始化计算散列值的各线程
-            this.fileHashes = new FileHash[HashTypeCount];
+            // 初始化计算散列值的各线程。
+            this.fileHashes = new FileHashCompute[HashTypeCount];
             this.fileHashComputeThreads = new Thread[HashTypeCount];
             for (int i = 0; i < FileHashParallel.HashTypeCount; i++)
             {
-                this.fileHashes[i] = new FileHash(this.fileHashComputeFileStreams[i], (FileHash.HashType)i);
+                this.fileHashes[i] = new FileHashCompute(this.fileHashComputeFileStreams[i], (HashType)i);
                 this.fileHashComputeThreads[i] = new Thread(this.fileHashes[i].Compute) { IsBackground = true };
             }
 
-            // 根据标志位启动对应线程
+            // 根据标志位启动对应线程。
             for (int i = 0; i < this.fileHashComputeThreads.Length; i++)
             {
                 if (this.fileHashEnables[i] == true)
@@ -209,10 +210,10 @@ namespace FileHash
                 }
             }
 
-            // 等待线程结束并取得计算结果
+            // 等待线程结束并取得计算结果。
             while (this.fileHashComputeThreads.Any(fileHashComputeThread => fileHashComputeThread.IsAlive))
             {
-                // 如果检测到取消操作，则直接退出，并触发计算完成事件，传递非正常完成参数
+                // 如果检测到取消操作，则直接退出，并触发计算完成事件，传递非正常完成参数。
                 if (this.fileHashComputeBackgroundWorker.CancellationPending)
                 {
                     this.IsCompleted = true;
@@ -222,7 +223,7 @@ namespace FileHash
                 Thread.Sleep(10);
             }
 
-            // 取出已经计算完成的结果，并触发计算完成事件，传递计算结果
+            // 取出已经计算完成的结果，并触发计算完成事件，传递计算结果。
             this.fileHashList.Clear();
             for (int i = 0; i < this.fileHashComputeThreads.Length; i++)
             {
@@ -235,13 +236,13 @@ namespace FileHash
                     this.fileHashList.Add(null);
                 }
             }
-            IsCompleted = true;
-            OnCompleted(this, new CompletedEventArgs(true, this));
+            this.IsCompleted = true;
+            this.OnCompleted(this, new CompletedEventArgs(true, this));
 
-            // 释放资源
-            foreach (FileStream fileHashCalculateFileStream in fileHashComputeFileStreams)
+            // 释放资源。
+            foreach (FileStream fileHashCalculateFileStream in this.fileHashComputeFileStreams)
             {
-                fileHashCalculateFileStream.Dispose();
+                fileHashCalculateFileStream?.Dispose();
             }
         }
 
@@ -280,9 +281,10 @@ namespace FileHash
         {
             if (!this.fileHashComputeBackgroundWorker.IsBusy)
             {
-                // 创建文件流并启动线程
+                // 创建文件流并启动线程。
                 this.IsStarted = true;
-                this.fileHashComputeFileStreams = this.CreatFileStreams(filePath, HashTypeCount);
+                this.fileHashComputeFileStreams = 
+                    this.CreatFileStreams(this.FilePath, FileHashParallel.HashTypeCount);
                 this.fileHashComputeBackgroundWorker.RunWorkerAsync();
             }
         }
@@ -304,7 +306,14 @@ namespace FileHash
         /// <summary>
         /// 释放此实例占用的资源
         /// </summary>
-        public void Dispose() => this.CancelAsync();
+        public void Dispose()
+        {
+            if (!this.isDisposed)
+            {
+                this.CancelAsync();
+                this.isDisposed = true;
+            }
+        }
 
         /// <summary>
         /// 文件散列值到十六进制字符串
@@ -436,27 +445,27 @@ namespace FileHash
             /// <summary>
             /// 以是否正常完成标志作为参数实例化此类
             /// </summary>
-            /// <param name="isNormallyCompleted"></param>
-            public CompletedEventArgs(bool isNormallyCompleted)
+            /// <param name="hasResult"></param>
+            public CompletedEventArgs(bool hasResult)
             {
-                this.IsNormallyCompleted = isNormallyCompleted;
+                this.HasResult = hasResult;
             }
 
             /// <summary>
             /// 以是否正常完成标志和计算结果作为参数实例化此类
             /// </summary>
-            /// <param name="isNormallyCompleted"></param>
+            /// <param name="hasResult"></param>
             /// <param name="result"></param>
-            public CompletedEventArgs(bool isNormallyCompleted, FileHashParallel result)
+            public CompletedEventArgs(bool hasResult, FileHashParallel result)
             {
-                this.IsNormallyCompleted = isNormallyCompleted;
+                this.HasResult = hasResult;
                 this.Result = result;
             }
 
             /// <summary>
             /// 指示是否正常完成的标志位
             /// </summary>
-            public bool IsNormallyCompleted { get; }
+            public bool HasResult { get; }
             /// <summary>
             /// 计算得到的散列值列表
             /// </summary>
