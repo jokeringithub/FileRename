@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FileHash
+﻿namespace FileHash
 {
     /// <summary>
     /// 散列值类型枚举类。
@@ -30,6 +28,6 @@ namespace FileHash
         /// <summary>
         /// SHA-512。
         /// </summary>
-        SHA512,
+        SHA512
     }
 }

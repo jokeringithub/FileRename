@@ -49,10 +49,13 @@ namespace FileRename
         /// </summary>
         private void InitializeParameter()
         {
-            this.NameRuleList.Add(
-                new NameRule(NameRule.TypeCode.OrderNumber)
-                { NumberLength = 3, StartNumberString = "001", EndNumberString = "999" });
-            this.NameRuleList.Add(new NameRule(NameRule.TypeCode.Extension));
+            var rule1 = NameRule.Create(NameRule.TypeCode.OrderNumber);
+            rule1.NumberLength = 3;
+            rule1.StartNumberString = "001";
+            rule1.EndNumberString = "999";
+            var rule2 = NameRule.Create(NameRule.TypeCode.Extension);
+            this.NameRuleList.Add(rule1);
+            this.NameRuleList.Add(rule2);
             this.RecurseSubdirectories.Value = false;
         }
 
@@ -73,7 +76,7 @@ namespace FileRename
         /// <returns>插入的新规则的索引。</returns>
         private int AddRule(int index)
         {
-            this.NameRuleList.Insert(index + 1, new NameRule(NameRule.TypeCode.ConstantString));
+            this.NameRuleList.Insert(index + 1, NameRule.Create(NameRule.TypeCode.ConstantString));
             return index + 1;
         }
 
@@ -145,7 +148,7 @@ namespace FileRename
             {
                 try
                 {
-                    var fileRenameInfo = new FileRenameInfo(filePath);
+                    var fileRenameInfo = FileRenameInfo.Create(filePath);
                     // 判断是否已经存在。
                     if (!this.FileRenameInfoList.Contains(fileRenameInfo))
                     { this.FileRenameInfoList.Add(fileRenameInfo); }
@@ -326,11 +329,11 @@ namespace FileRename
         {
             for (int i = 0; i < this.FileRenameInfoList.Count; i++)
             {
-                var fileRename = new NewFilename(
+                var fileNewName = new FileNewName(
                     this.NameRuleList, this.FileRenameInfoList[i].FullName, i);
                 try
                 {
-                    this.FileRenameInfoList[i].NewName = fileRename.NewName;
+                    this.FileRenameInfoList[i].NewName = fileNewName.Value;
                 }
                 catch (FormatException)
                 {
@@ -396,7 +399,7 @@ namespace FileRename
         /// <returns>占位项目后一项的索引。</returns>
         private int AddDummyFileInfo(int index)
         {
-            this.FileRenameInfoList.Insert((index >= 0) ? index : 0, new FileRenameInfo(""));
+            this.FileRenameInfoList.Insert((index >= 0) ? index : 0, FileRenameInfo.Create(""));
             return index + 1;
         }
 
