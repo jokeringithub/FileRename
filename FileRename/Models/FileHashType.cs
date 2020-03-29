@@ -1,32 +1,32 @@
-﻿namespace FileHash
+﻿namespace XstarS.FileRename.Models
 {
     /// <summary>
-    /// 散列值类型枚举类。
+    /// 表示文件哈希值的类型。
     /// </summary>
-    public enum HashType
+    public enum FileHashType
     {
         /// <summary>
-        /// CRC32。
+        /// 表示无文件哈希值。
         /// </summary>
-        CRC32,
+        Empty,
         /// <summary>
-        /// MD5。
+        /// 表示 MD5 文件哈希值。
         /// </summary>
         MD5,
         /// <summary>
-        /// SHA-1。
+        /// 表示 SHA-1 文件哈希值。
         /// </summary>
         SHA1,
         /// <summary>
-        /// SHA-256。
+        /// 表示 SHA-256 文件哈希值。
         /// </summary>
         SHA256,
         /// <summary>
-        /// SHA-384。
+        /// 表示 SHA-384 文件哈希值。
         /// </summary>
         SHA384,
         /// <summary>
-        /// SHA-512。
+        /// 表示 SHA-512 文件哈希值。
         /// </summary>
         SHA512
     }
