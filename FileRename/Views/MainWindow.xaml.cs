@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
+using XstarS.ComponentModel;
 
 namespace XstarS.FileRename.Views
 {
@@ -25,6 +26,7 @@ namespace XstarS.FileRename.Views
         {
             this.DataContext = new MainWindowModel();
             this.Model.PropertyChanged += this.Model_PropertyChanged;
+            this.Model.Exception += this.Model_Exception;
             this.InitializeComponent();
         }
 
@@ -203,6 +205,21 @@ namespace XstarS.FileRename.Views
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             this.Dispatcher.Invoke(CommandManager.InvalidateRequerySuggested);
+        }
+
+        /// <summary>
+        /// 当前窗口数据逻辑模型转发异常的事件处理。
+        /// </summary>
+        /// <param name="sender">事件源。</param>
+        /// <param name="e">提供事件数据的对象。</param>
+        private void Model_Exception(object sender, ExceptionEventArgs e)
+        {
+            if (!e.IsHandled)
+            {
+                MessageBox.Show(this, e.Exception.ToString(),
+                    "异常", MessageBoxButton.OK, MessageBoxImage.Information);
+                e.IsHandled = true;
+            }
         }
     }
 }

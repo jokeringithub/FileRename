@@ -62,14 +62,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Bindings\ObservableDataObject.cs" />
-    <Compile Include="Bindings\ObservableObject.cs" />
     <Compile Include="Converters\Int32ZeroToVisibilityConverter.cs" />
+    <Compile Include="Converters\NamingRuleTypeToIndexConverter.cs" />
     <Compile Include="Converters\NamingRuleTypeToStringConverter.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
+    <Compile Include="Models\FileHash.cs" />
     <Compile Include="Models\FileHashType.cs" />
     <Compile Include="Models\FileHashTypeView.cs" />
+    <Compile Include="Models\FileRenameInfo.cs" />
+    <Compile Include="Models\NamingRule.cs" />
     <Compile Include="Models\NamingRuleType.cs" />
+    <Compile Include="References\CommandBase.cs" />
+    <Compile Include="References\ComponentModelBase.cs" />
+    <Compile Include="References\DelegateCommand.cs" />
+    <Compile Include="References\ExceptionEventArgs.cs" />
+    <Compile Include="References\ExceptioningObject.cs" />
+    <Compile Include="References\IDispatchException.cs" />
+    <Compile Include="References\ISendMessage.cs" />
+    <Compile Include="References\MessageEventArgs.cs" />
+    <Compile Include="References\MessageLevel.cs" />
+    <Compile Include="References\MessagingObject.cs" />
+    <Compile Include="References\Observable.cs" />
+    <Compile Include="References\ObservableDataObject.cs" />
+    <Compile Include="References\ObservableObject.cs" />
     <Compile Include="Views\MainWindowModel.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -79,16 +94,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\FileHash.cs" />
-    <Compile Include="Models\FileRenameInfo.cs" />
-    <Compile Include="Converters\NamingRuleTypeToIndexConverter.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\NamingRule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

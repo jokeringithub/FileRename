@@ -6,7 +6,7 @@ namespace XstarS.FileRename.Models
     /// <summary>
     /// 表示文件重命名的命名规则。
     /// </summary>
-    public class NamingRule : ObservableDataObject
+    public class NamingRule : ComponentModelBase
     {
         /// <summary>
         /// 以指定的命名规则初始化 <see cref="NamingRule"/> 类的新实例。
@@ -47,14 +47,23 @@ namespace XstarS.FileRename.Models
         public int NumberLength
         {
             get => this.GetProperty<int>();
-            set => this.SetProperty(value);
+            set
+            {
+                if (value < 0)
+                {
+                    this.DispatchException(new ArgumentOutOfRangeException(nameof(value)));
+                    this.NotifyPropertyChanged();
+                }
+                else
+                {
+                    this.SetProperty(value);
+                }
+            }
         }
 
         /// <summary>
         /// 获取或设置编号起始值。
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="value"/> 的值小于 0。</exception>
         public int StartNumber
         {
             get => this.GetProperty<int>();
@@ -62,9 +71,13 @@ namespace XstarS.FileRename.Models
             {
                 if (value < 0)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(value));
+                    this.DispatchException(new ArgumentOutOfRangeException(nameof(value)));
+                    this.NotifyPropertyChanged();
                 }
-                this.SetProperty(value);
+                else
+                {
+                    this.SetProperty(value);
+                }
             }
         }
 
@@ -80,8 +93,6 @@ namespace XstarS.FileRename.Models
         /// <summary>
         /// 获取或设置原文件名起始索引。
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="value"/> 的值小于等于 0。</exception>
         public int StartIndex
         {
             get => this.GetProperty<int>();
@@ -89,17 +100,19 @@ namespace XstarS.FileRename.Models
             {
                 if (value <= 0)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(value));
+                    this.DispatchException(new ArgumentOutOfRangeException(nameof(value)));
+                    this.NotifyPropertyChanged();
                 }
-                this.SetProperty(value);
+                else
+                {
+                    this.SetProperty(value);
+                }
             }
         }
 
         /// <summary>
         /// 获取或设置原文件名结束索引，为 -1 表示文件名结尾。
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="value"/> 的值小于等于 0 且不为 -1。</exception>
         public int EndIndex
         {
             get => this.GetProperty<int>();
@@ -107,9 +120,13 @@ namespace XstarS.FileRename.Models
             {
                 if (value <= 0 && value != -1)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(value));
+                    this.DispatchException(new ArgumentOutOfRangeException(nameof(value)));
+                    this.NotifyPropertyChanged();
                 }
-                this.SetProperty(value);
+                else
+                {
+                    this.SetProperty(value);
+                }
             }
         }
 
@@ -182,6 +199,7 @@ namespace XstarS.FileRename.Models
         /// </summary>
         /// <param name="filePath">文件路径。</param>
         /// <returns>文件哈希值。</returns>
+        /// <exception cref="Exception">计算文件哈希值时出现错误。</exception>
         private string GetFileHash(string filePath)
         {
             using (var fileHash = new FileHash(filePath, this.HashType.Value))

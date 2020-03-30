@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using XstarS.ComponentModel;
 using XstarS.FileRename.Helpers;
@@ -9,9 +10,9 @@ using XstarS.FileRename.Models;
 namespace XstarS.FileRename.Views
 {
     /// <summary>
-    /// 表示 <see cref="MainWindow"/> 的数据模型。
+    /// 表示 <see cref="MainWindow"/> 的数据逻辑模型。
     /// </summary>
-    public class MainWindowModel : ObservableDataObject
+    public class MainWindowModel : ComponentModelBase
     {
         /// <summary>
         /// 初始化 <see cref="MainWindowModel"/> 类的新实例。
@@ -19,11 +20,11 @@ namespace XstarS.FileRename.Views
         public MainWindowModel()
         {
             this.NamingRules = new ObservableCollection<NamingRule>();
+            this.InitializeNamingRules();
             this.RenamingFiles = new ObservableCollection<FileRenameInfo>();
             this.RenamingFiles.CollectionChanged += this.RenamingFiles_CollectionChanged;
             this.SelectedNamingRuleIndex = 0;
             this.SelectedRenamingFileIndex = -1;
-            this.InitializeNamingRules();
         }
 
         /// <summary>
@@ -43,6 +44,13 @@ namespace XstarS.FileRename.Views
                 this.NotifyPropertyChanged(nameof(this.CanRemoveNamingRule));
             }
         }
+
+        /// <summary>
+        /// 获取当前选中的命名规则。
+        /// </summary>
+        public NamingRule SelectedNamingRule =>
+            (this.SelectedNamingRuleIndex >= 0) ?
+            this.NamingRules[this.SelectedNamingRuleIndex] : null;
 
         /// <summary>
         /// 获取当前是否可以移除命名规则。
@@ -171,12 +179,15 @@ namespace XstarS.FileRename.Views
         /// <summary>
         /// 根据当前命名规则生成新文件名。
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Design", "CA1031:DoNotNatchGeneralExceptionTypes")]
         public void PreviewFileRename()
         {
             for (int index = 0; index < this.RenamingFiles.Count; index++)
             {
                 var file = this.RenamingFiles[index];
-                file.UpdateNewName(this.NamingRules, index);
+                try { file.UpdateNewName(this.NamingRules, index); }
+                catch (Exception e) { this.DispatchException(e); }
             }
             this.NotifyPropertyChanged(nameof(this.CanDoFileRename));
             this.NotifyPropertyChanged(nameof(this.CanUndoFileRename));
@@ -234,6 +245,29 @@ namespace XstarS.FileRename.Views
             }
             this.NotifyPropertyChanged(nameof(this.CanDoFileRename));
             this.NotifyPropertyChanged(nameof(this.CanUndoFileRename));
+        }
+
+        /// <inheritdoc/>
+        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(e);
+            if (e.PropertyName == nameof(this.SelectedNamingRuleIndex))
+            {
+                if (!(this.SelectedNamingRule is null))
+                {
+                    this.SelectedNamingRule.Exception += this.SelectedNamingRule_Exception;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 当前选中的 <see cref="NamingRule"/> 发生异常的事件处理。
+        /// </summary>
+        /// <param name="sender">事件源。</param>
+        /// <param name="e">提供事件数据的对象。</param>
+        private void SelectedNamingRule_Exception(object sender, ExceptionEventArgs e)
+        {
+            this.OnException(e);
         }
 
         /// <summary>

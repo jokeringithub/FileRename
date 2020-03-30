@@ -52,7 +52,8 @@
                          SelectedIndex="{Binding SelectedNamingRuleIndex}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Label Content="{Binding RuleType, Converter={StaticResource NamingRuleTypeToStringConverter}}"/>
+                            <Label Content="{Binding RuleType,
+                                Converter={StaticResource NamingRuleTypeToStringConverter}}"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -104,9 +105,11 @@
                                             Binding="{Binding LastWriteTime, Mode=OneWay}"/>
                     </DataGrid.Columns>
                 </DataGrid>
-                <Label Content="可将文件或文件夹拖入框中"
+                <Label Content="支持文件或文件夹拖放"
                        HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Visibility="{Binding RenamingFiles.Count, Converter={StaticResource Int32ZeroToVisibilityConverter}, Mode=OneWay}"/>
+                       Visibility="{Binding RenamingFiles.Count,
+                                            Converter={StaticResource Int32ZeroToVisibilityConverter},
+                                            Mode=OneWay}"/>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="80"/>
@@ -133,7 +136,8 @@
         <TabControl Grid.Row="1" Margin="5"
                     DataContext="{Binding SelectedItem, ElementName=NamingRuleListBox}"
                     d:DataContext="{d:DesignInstance model:NamingRule}"
-                    SelectedIndex="{Binding RuleType, Converter={StaticResource NamingRuleTypeToIndexConverter}}">
+                    SelectedIndex="{Binding RuleType,
+                                            Converter={StaticResource NamingRuleTypeToIndexConverter}}">
             <TabItem Header="文本"
                      HorizontalAlignment="Left" VerticalAlignment="Top"
                      Width="75" Height="25">
