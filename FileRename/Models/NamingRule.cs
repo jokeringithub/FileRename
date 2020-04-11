@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using XstarS.ComponentModel;
 
 namespace XstarS.FileRename.Models
@@ -6,7 +7,7 @@ namespace XstarS.FileRename.Models
     /// <summary>
     /// 表示文件重命名的命名规则。
     /// </summary>
-    public class NamingRule : ComponentModelBase
+    public class NamingRule : ObservableValidDataObject
     {
         /// <summary>
         /// 以指定的命名规则初始化 <see cref="NamingRule"/> 类的新实例。
@@ -47,18 +48,7 @@ namespace XstarS.FileRename.Models
         public int NumberLength
         {
             get => this.GetProperty<int>();
-            set
-            {
-                if (value < 0)
-                {
-                    this.DispatchException(new ArgumentOutOfRangeException(nameof(value)));
-                    this.NotifyPropertyChanged();
-                }
-                else
-                {
-                    this.SetProperty(value);
-                }
-            }
+            set => this.SetProperty(value);
         }
 
         /// <summary>
@@ -67,18 +57,7 @@ namespace XstarS.FileRename.Models
         public int StartNumber
         {
             get => this.GetProperty<int>();
-            set
-            {
-                if (value < 0)
-                {
-                    this.DispatchException(new ArgumentOutOfRangeException(nameof(value)));
-                    this.NotifyPropertyChanged();
-                }
-                else
-                {
-                    this.SetProperty(value);
-                }
-            }
+            set => this.SetProperty(value);
         }
 
         /// <summary>
@@ -96,18 +75,7 @@ namespace XstarS.FileRename.Models
         public int StartIndex
         {
             get => this.GetProperty<int>();
-            set
-            {
-                if (value <= 0)
-                {
-                    this.DispatchException(new ArgumentOutOfRangeException(nameof(value)));
-                    this.NotifyPropertyChanged();
-                }
-                else
-                {
-                    this.SetProperty(value);
-                }
-            }
+            set => this.SetProperty(value);
         }
 
         /// <summary>
@@ -116,18 +84,7 @@ namespace XstarS.FileRename.Models
         public int EndIndex
         {
             get => this.GetProperty<int>();
-            set
-            {
-                if (value <= 0 && value != -1)
-                {
-                    this.DispatchException(new ArgumentOutOfRangeException(nameof(value)));
-                    this.NotifyPropertyChanged();
-                }
-                else
-                {
-                    this.SetProperty(value);
-                }
-            }
+            set => this.SetProperty(value);
         }
 
         /// <summary>
@@ -148,6 +105,34 @@ namespace XstarS.FileRename.Models
             set => this.SetProperty(value);
         }
 
+        /// <inheritdoc/>
+        protected override void ValidateProperty(
+            [CallerMemberName] string propertyName = null)
+        {
+            base.ValidateProperty(propertyName);
+            var hasErrors = false;
+            switch (propertyName)
+            {
+                case nameof(this.NumberLength):
+                    hasErrors = this.NumberLength < 0;
+                    break;
+                case nameof(this.StartNumber):
+                    hasErrors = this.StartNumber < 0;
+                    break;
+                case nameof(this.StartIndex):
+                    hasErrors = this.StartIndex <= 0;
+                    break;
+                case nameof(this.EndIndex):
+                    hasErrors = this.EndIndex <= 0 && this.EndIndex != -1;
+                    break;
+                default:
+                    break;
+            }
+            var errors = hasErrors ?
+                new[] { new ArgumentOutOfRangeException().Message } : null;
+            this.SetErrors(errors, propertyName);
+        }
+
         /// <summary>
         /// 获取指定文件按照当前命名规则得到的新文件名的部分。
         /// </summary>
@@ -157,6 +142,10 @@ namespace XstarS.FileRename.Models
         /// <exception cref="Exception">生成新文件名过程中出现错误。</exception>
         public string GetName(FileRenameInfo file, int index)
         {
+            if (this.HasErrors)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
             switch (this.RuleType)
             {
                 case NamingRuleType.ConstantString:

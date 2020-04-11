@@ -12,7 +12,7 @@ namespace XstarS.FileRename.Views
     /// <summary>
     /// 表示 <see cref="MainWindow"/> 的数据逻辑模型。
     /// </summary>
-    public class MainWindowModel : ComponentModelBase
+    public class MainWindowModel : ObservableValidDataObject
     {
         /// <summary>
         /// 初始化 <see cref="MainWindowModel"/> 类的新实例。
@@ -20,6 +20,7 @@ namespace XstarS.FileRename.Views
         public MainWindowModel()
         {
             this.NamingRules = new ObservableCollection<NamingRule>();
+            this.NamingRules.CollectionChanged += this.NamingRules_CollectionChanged;
             this.InitializeNamingRules();
             this.RenamingFiles = new ObservableCollection<FileRenameInfo>();
             this.RenamingFiles.CollectionChanged += this.RenamingFiles_CollectionChanged;
@@ -38,24 +39,20 @@ namespace XstarS.FileRename.Views
         public int SelectedNamingRuleIndex
         {
             get => this.GetProperty<int>();
-            set
-            {
-                this.SetProperty(value);
-                this.NotifyPropertyChanged(nameof(this.CanRemoveNamingRule));
-            }
+            set => this.SetProperty(value);
         }
 
         /// <summary>
         /// 获取当前选中的命名规则。
         /// </summary>
         public NamingRule SelectedNamingRule =>
-            (this.SelectedNamingRuleIndex >= 0) ?
+            this.SelectedNamingRuleIndex >= 0 ?
             this.NamingRules[this.SelectedNamingRuleIndex] : null;
 
         /// <summary>
-        /// 获取当前是否可以移除命名规则。
+        /// 获取当前是否存在被选中的命名规则。
         /// </summary>
-        public bool CanRemoveNamingRule => this.SelectedNamingRuleIndex >= 0;
+        public bool HasSelectedNamingRule => !(this.SelectedNamingRule is null);
 
         /// <summary>
         /// 获取要重命名的文件。
@@ -68,22 +65,25 @@ namespace XstarS.FileRename.Views
         public int SelectedRenamingFileIndex
         {
             get => this.GetProperty<int>();
-            set
-            {
-                this.SetProperty(value);
-                this.NotifyPropertyChanged(nameof(this.CanRemoveRenamingFile));
-            }
+            set => this.SetProperty(value);
         }
 
         /// <summary>
-        /// 获取当前是否可以移除要重命名的文件。
+        /// 获取当前选中的要重命名的文件。
         /// </summary>
-        public bool CanRemoveRenamingFile => this.SelectedRenamingFileIndex >= 0;
+        public FileRenameInfo SelectedRenamingFile =>
+            this.SelectedRenamingFileIndex >= 0 ?
+            this.RenamingFiles[this.SelectedRenamingFileIndex] : null;
+
+        /// <summary>
+        /// 获取当前是否存在被选中的要重命名的文件。
+        /// </summary>
+        public bool HasSelectedRenamingFile => !(this.SelectedRenamingFile is null);
 
         /// <summary>
         /// 获取当前是否可以移除所有要重命名的文件。
         /// </summary>
-        public bool CanClearRenamingFiles => this.RenamingFiles.Count > 0;
+        public bool HasRenamingFiles => this.RenamingFiles.Count > 0;
 
         /// <summary>
         /// 获取当前是否可以执行文件重命名。
@@ -186,8 +186,10 @@ namespace XstarS.FileRename.Views
             for (int index = 0; index < this.RenamingFiles.Count; index++)
             {
                 var file = this.RenamingFiles[index];
+                var errors = (string[])null;
                 try { file.UpdateNewName(this.NamingRules, index); }
-                catch (Exception e) { this.DispatchException(e); }
+                catch (Exception e) { errors = new[] { e.Message }; }
+                this.SetErrors(errors, string.Empty);
             }
             this.NotifyPropertyChanged(nameof(this.CanDoFileRename));
             this.NotifyPropertyChanged(nameof(this.CanUndoFileRename));
@@ -196,8 +198,6 @@ namespace XstarS.FileRename.Views
         /// <summary>
         /// 执行文件重命名。
         /// </summary>
-        /// <exception cref="InvalidOperationException">
-        /// 在未应用新文件名的情况下执行文件重命名。</exception>
         public void DoFileRename()
         {
             while (true)
@@ -223,8 +223,6 @@ namespace XstarS.FileRename.Views
         /// <summary>
         /// 撤销文件重命名。
         /// </summary>
-        /// <exception cref="InvalidOperationException">
-        /// 在未执行文件重命名的情况下撤销文件重命名。</exception>
         public void UndoFileRename()
         {
             while (true)
@@ -251,23 +249,66 @@ namespace XstarS.FileRename.Views
         protected override void OnPropertyChanged(PropertyChangedEventArgs e)
         {
             base.OnPropertyChanged(e);
-            if (e.PropertyName == nameof(this.SelectedNamingRuleIndex))
+            switch (e.PropertyName)
             {
-                if (!(this.SelectedNamingRule is null))
-                {
-                    this.SelectedNamingRule.Exception += this.SelectedNamingRule_Exception;
-                }
+                case nameof(this.SelectedNamingRuleIndex):
+                    this.NotifyPropertyChanged(nameof(this.SelectedNamingRule));
+                    break;
+                case nameof(this.SelectedNamingRule):
+                    this.NotifyPropertyChanged(nameof(this.HasSelectedNamingRule));
+                    this.ListenSelectedNamingRuleErrors();
+                    break;
+                case nameof(this.SelectedRenamingFileIndex):
+                    this.NotifyPropertyChanged(nameof(this.SelectedRenamingFile));
+                    break;
+                case nameof(this.SelectedRenamingFile):
+                    this.NotifyPropertyChanged(nameof(this.HasSelectedRenamingFile));
+                    break;
+                default:
+                    break;
             }
         }
 
         /// <summary>
-        /// 当前选中的 <see cref="NamingRule"/> 发生异常的事件处理。
+        /// 监听 <see cref="MainWindowModel.SelectedNamingRule"/> 的验证错误更改事件。
+        /// </summary>
+        private void ListenSelectedNamingRuleErrors()
+        {
+            if (this.HasSelectedNamingRule)
+            {
+                this.SelectedNamingRule.ErrorsChanged -= this.SelectedNamingRule_ErrorsChanged;
+                this.SelectedNamingRule.ErrorsChanged += this.SelectedNamingRule_ErrorsChanged;
+            }
+        }
+
+        /// <summary>
+        /// 更新 <see cref="MainWindowModel.NamingRules"/> 的所有验证错误。
+        /// </summary>
+        private void UpdateNamingRulesErrors()
+        {
+            var errors = this.NamingRules.Any(rule => rule.HasErrors) ?
+                new[] { new ArgumentException().Message } : null;
+            this.SetErrors(errors, nameof(this.NamingRules));
+        }
+
+        /// <summary>
+        /// <see cref="MainWindowModel.SelectedNamingRule"/> 验证错误更改时的事件处理。
         /// </summary>
         /// <param name="sender">事件源。</param>
         /// <param name="e">提供事件数据的对象。</param>
-        private void SelectedNamingRule_Exception(object sender, ExceptionEventArgs e)
+        private void SelectedNamingRule_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
         {
-            this.OnException(e);
+            this.UpdateNamingRulesErrors();
+        }
+
+        /// <summary>
+        /// <see cref="MainWindowModel.NamingRules"/> 集合发生更改时的事件处理。
+        /// </summary>
+        /// <param name="sender">事件源。</param>
+        /// <param name="e">提供事件数据的对象。</param>
+        private void NamingRules_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            this.UpdateNamingRulesErrors();
         }
 
         /// <summary>
@@ -275,10 +316,9 @@ namespace XstarS.FileRename.Views
         /// </summary>
         /// <param name="sender">事件源。</param>
         /// <param name="e">提供事件数据的对象。</param>
-        private void RenamingFiles_CollectionChanged(
-            object sender, NotifyCollectionChangedEventArgs e)
+        private void RenamingFiles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            this.NotifyPropertyChanged(nameof(this.CanClearRenamingFiles));
+            this.NotifyPropertyChanged(nameof(this.HasRenamingFiles));
             this.NotifyPropertyChanged(nameof(this.CanDoFileRename));
             this.NotifyPropertyChanged(nameof(this.CanUndoFileRename));
         }

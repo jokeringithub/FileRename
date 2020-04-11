@@ -1,8 +1,9 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
-using XstarS.ComponentModel;
 
 namespace XstarS.FileRename.Views
 {
@@ -26,7 +27,7 @@ namespace XstarS.FileRename.Views
         {
             this.DataContext = new MainWindowModel();
             this.Model.PropertyChanged += this.Model_PropertyChanged;
-            this.Model.Exception += this.Model_Exception;
+            this.Model.ErrorsChanged += this.Model_ErrorsChanged;
             this.InitializeComponent();
         }
 
@@ -46,19 +47,20 @@ namespace XstarS.FileRename.Views
                     (sender, e) => ((MainWindow)sender).Model.AddNamingRule()),
                 new CommandBinding(MainWindow.RemoveNamingRuleCommand,
                     (sender, e) => ((MainWindow)sender).Model.RemoveNamingRule(),
-                    (sender, e) => e.CanExecute = ((MainWindow)sender).Model.CanRemoveNamingRule),
+                    (sender, e) => e.CanExecute = ((MainWindow)sender).Model.HasSelectedNamingRule),
                 new CommandBinding(MainWindow.AddDummyFileCommand,
                     (sender, e) => ((MainWindow)sender).Model.AddDummyFile()),
                 new CommandBinding(MainWindow.AddRenamingFileCommand,
                     (sender, e) => ((MainWindow)sender).AddRenamingFile()),
                 new CommandBinding(MainWindow.RemoveRenamingFileCommand,
                     (sender, e) => ((MainWindow)sender).Model.RemoveRenamingFile(),
-                    (sender, e) => e.CanExecute = ((MainWindow)sender).Model.CanRemoveRenamingFile),
+                    (sender, e) => e.CanExecute = ((MainWindow)sender).Model.HasSelectedRenamingFile),
                 new CommandBinding(MainWindow.ClearRenamingFilesCommand,
                     (sender, e) => ((MainWindow)sender).Model.ClearRenamingFiles(),
-                    (sender, e) => e.CanExecute = ((MainWindow)sender).Model.CanClearRenamingFiles),
+                    (sender, e) => e.CanExecute = ((MainWindow)sender).Model.HasRenamingFiles),
                 new CommandBinding(MainWindow.PreviewFileRenameCommand,
-                    (sender, e) => ((MainWindow)sender).Model.PreviewFileRename()),
+                    (sender, e) => ((MainWindow)sender).Model.PreviewFileRename(),
+                    (sender, e) => e.CanExecute = ((MainWindow)sender).Model.HasRenamingFiles),
                 new CommandBinding(MainWindow.DoFileRenameCommand,
                     (sender, e) => ((MainWindow)sender).Model.DoFileRename(),
                     (sender, e) => e.CanExecute = ((MainWindow)sender).Model.CanDoFileRename),
@@ -208,17 +210,21 @@ namespace XstarS.FileRename.Views
         }
 
         /// <summary>
-        /// 当前窗口数据逻辑模型转发异常的事件处理。
+        /// 当前窗口数据逻辑模型的验证错误更改的事件处理。
         /// </summary>
         /// <param name="sender">事件源。</param>
         /// <param name="e">提供事件数据的对象。</param>
-        private void Model_Exception(object sender, ExceptionEventArgs e)
+        private void Model_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
         {
-            if (!e.IsHandled)
+            if (string.IsNullOrEmpty(e.PropertyName))
             {
-                MessageBox.Show(this, e.Exception.ToString(),
-                    "异常", MessageBoxButton.OK, MessageBoxImage.Information);
-                e.IsHandled = true;
+                var errors = ((MainWindowModel)sender).GetErrors(e.PropertyName);
+                if (!(errors is null))
+                {
+                    var message = string.Join(Environment.NewLine, errors.OfType<object>());
+                    MessageBox.Show(this, message,
+                        "异常", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
         }
     }
