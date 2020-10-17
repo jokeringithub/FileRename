@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="XstarS.FileRename.Converters.Int32ZeroToVisibilityConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="29.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Converters\Int32ZeroToVisibilityConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="XstarS.FileRename.Converters.NamingRuleTypeToIndexConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="27.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Converters\NamingRuleTypeToIndexConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="XstarS.FileRename.Converters.NamingRuleTypeToStringConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="29.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Converters\NamingRuleTypeToStringConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="XstarS.ComponentModel.EnumVectorView&lt;TEnum&gt;" Collapsed="true">
+    <Position X="23.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAAAACIAAAAAAAAEAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>References\EnumVectorView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XstarS.ComponentModel.ObservableDataObject" Collapsed="true">
+    <Position X="19.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAIQAIAAAAAAAgAEAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>References\ObservableDataObject.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="XstarS.ComponentModel.ObservableValidDataObject" Collapsed="true">
+    <Position X="17.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAQAAABAAAAAAAAAAEAAAEIAAAAAAABIAA=</HashCode>
+      <FileName>References\ObservableValidDataObject.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="XstarS.FileRename.Helpers.PathHelper" Collapsed="true">
+    <Position X="25.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Helpers\PathHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XstarS.FileRename.Models.FileHash" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="27.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEBAQAAAACABABAAAAAAABAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Models\FileHash.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="XstarS.FileRename.Models.FileHashTypeView" Collapsed="true">
+    <Position X="23.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAEAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Models\FileHashTypeView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XstarS.FileRename.Models.FileRenameInfo" Collapsed="true">
+    <Position X="21" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQIAAAkIAABEAAAARQEAAAFQAKAAgAAAAgEAA=</HashCode>
+      <FileName>Models\FileRenameInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XstarS.FileRename.Models.NamingRule" Collapsed="true">
+    <Position X="18.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAwAAAEBAAAAAAAAQIAgAAQCAAAIQBgAAAAAAABAA=</HashCode>
+      <FileName>Models\NamingRule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XstarS.FileRename.Views.MainWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ADAAAEAIgAAAAAAEAAEAAACCACoABAQAAAgAAIAAAAA=</HashCode>
+      <FileName>Views\MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="XstarS.FileRename.Views.MainWindowModel" Collapsed="true">
+    <Position X="16.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACQAIEAAiBABAAAAIoAgAAEAABoAoARAFABAQAAAAEQ=</HashCode>
+      <FileName>Views\MainWindowModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="XstarS.FileRename.App" Collapsed="true">
+    <Position X="25.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="XstarS.FileRename.Models.FileHashType" Collapsed="true">
+    <Position X="25.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAEAAAAAAAAAoAAAIAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Models\FileHashType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="XstarS.FileRename.Models.NamingRuleType" Collapsed="true">
+    <Position X="27.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAQIAAAAAAAJAAAA=</HashCode>
+      <FileName>Models\NamingRuleType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

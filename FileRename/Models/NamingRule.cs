@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations;
 using XstarS.ComponentModel;
 
 namespace XstarS.FileRename.Models
@@ -20,7 +20,7 @@ namespace XstarS.FileRename.Models
             this.HashType = new FileHashTypeView() { MD5 = true };
             this.NumberLength = 0;
             this.StartNumber = 1;
-            this.StartIndex = 1;
+            this.StartIndex = 0;
             this.EndIndex = -1;
         }
 
@@ -45,6 +45,7 @@ namespace XstarS.FileRename.Models
         /// <summary>
         /// 获取编号数字长度，为 0 表示可变长度。
         /// </summary>
+        [Range(0, int.MaxValue)]
         public int NumberLength
         {
             get => this.GetProperty<int>();
@@ -54,6 +55,7 @@ namespace XstarS.FileRename.Models
         /// <summary>
         /// 获取或设置编号起始值。
         /// </summary>
+        [Range(0, int.MaxValue)]
         public int StartNumber
         {
             get => this.GetProperty<int>();
@@ -72,6 +74,7 @@ namespace XstarS.FileRename.Models
         /// <summary>
         /// 获取或设置原文件名起始索引。
         /// </summary>
+        [Range(0, int.MaxValue)]
         public int StartIndex
         {
             get => this.GetProperty<int>();
@@ -81,6 +84,7 @@ namespace XstarS.FileRename.Models
         /// <summary>
         /// 获取或设置原文件名结束索引，为 -1 表示文件名结尾。
         /// </summary>
+        [Range(-1, int.MaxValue)]
         public int EndIndex
         {
             get => this.GetProperty<int>();
@@ -103,34 +107,6 @@ namespace XstarS.FileRename.Models
         {
             get => this.GetProperty<string>();
             set => this.SetProperty(value);
-        }
-
-        /// <inheritdoc/>
-        protected override void ValidateProperty(
-            [CallerMemberName] string propertyName = null)
-        {
-            base.ValidateProperty(propertyName);
-            var hasErrors = false;
-            switch (propertyName)
-            {
-                case nameof(this.NumberLength):
-                    hasErrors = this.NumberLength < 0;
-                    break;
-                case nameof(this.StartNumber):
-                    hasErrors = this.StartNumber < 0;
-                    break;
-                case nameof(this.StartIndex):
-                    hasErrors = this.StartIndex <= 0;
-                    break;
-                case nameof(this.EndIndex):
-                    hasErrors = this.EndIndex <= 0 && this.EndIndex != -1;
-                    break;
-                default:
-                    break;
-            }
-            var errors = hasErrors ?
-                new[] { new ArgumentOutOfRangeException().Message } : null;
-            this.SetErrors(errors, propertyName);
         }
 
         /// <summary>
@@ -208,7 +184,7 @@ namespace XstarS.FileRename.Models
             var endIndex = this.EndIndex;
             if (endIndex == -1) { endIndex = fileName.Length; }
             if (endIndex > fileName.Length) { endIndex = fileName.Length; }
-            var startIndex = this.StartIndex - 1;
+            var startIndex = this.StartIndex;
             if (startIndex > endIndex) { startIndex = endIndex; }
             return fileName.Substring(startIndex, endIndex - startIndex);
         }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 
 namespace XstarS.ComponentModel
@@ -29,19 +31,21 @@ namespace XstarS.ComponentModel
         /// <summary>
         /// 获取当前实体是否包含验证错误。
         /// </summary>
+        /// <returns>如果实体当前具有验证错误，
+        /// 则为 <see langword="true"/>；否则为 <see langword="false"/>。</returns>
         public bool HasErrors => !this.PropertiesErrors.IsEmpty;
 
         /// <summary>
-        /// 当验证错误针对属性或整个实体更改时发生。
+        /// 当验证错误更改时发生。
         /// </summary>
         [field: NonSerialized]
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
         /// <summary>
-        /// 获取针对指定属性或整个实体的验证错误。
+        /// 获取指定属性的验证错误。
         /// </summary>
-        /// <param name="propertyName">要检索验证错误的属性的名称。</param>
-        /// <returns>针对属性或实体的验证错误。</returns>
+        /// <param name="propertyName">要获取验证错误的属性的名称。</param>
+        /// <returns>指定属性的验证错误。</returns>
         public IEnumerable GetErrors(
             [CallerMemberName] string propertyName = null)
         {
@@ -53,22 +57,24 @@ namespace XstarS.ComponentModel
         /// <summary>
         /// 设置指定属性的验证错误。
         /// </summary>
-        /// <param name="errors">指定属性的验证错误。</param>
+        /// <param name="errors">属性的验证错误。</param>
         /// <param name="propertyName">要设置验证错误的属性的名称。</param>
-        protected void SetErrors(IEnumerable errors,
+        protected virtual void SetErrors(IEnumerable errors,
             [CallerMemberName] string propertyName = null)
         {
             propertyName = propertyName ?? string.Empty;
-            if (!(errors is null)) { this.PropertiesErrors[propertyName] = errors; }
+            var hasErrors = !(errors is null) && errors.GetEnumerator().MoveNext();
+            if (hasErrors) { this.PropertiesErrors[propertyName] = errors; }
             else { this.PropertiesErrors.TryRemove(propertyName, out errors); }
             this.NotifyErrorsChanged(propertyName);
+            this.NotifyPropertyChanged(nameof(this.HasErrors));
         }
 
         /// <summary>
         /// 设置指定属性的值。
         /// </summary>
         /// <typeparam name="T">属性的类型。</typeparam>
-        /// <param name="value">属性的新值，一般为 <see langword="value"/>。</param>
+        /// <param name="value">属性的新值。</param>
         /// <param name="propertyName">要设置值的属性的名称。</param>
         protected override void SetProperty<T>(T value,
             [CallerMemberName] string propertyName = null)
@@ -85,6 +91,14 @@ namespace XstarS.ComponentModel
         protected virtual void ValidateProperty(
             [CallerMemberName] string propertyName = null)
         {
+            propertyName = propertyName ?? string.Empty;
+            var value = this.GetProperty<object>(propertyName);
+            var context = new ValidationContext(this) { MemberName = propertyName };
+            var results = new List<ValidationResult>();
+            try { Validator.TryValidateProperty(value, context, results); } catch { }
+            var errors = new List<string>(results.Count);
+            foreach (var result in results) { errors.Add(result.ErrorMessage); }
+            this.SetErrors(errors, propertyName);
         }
 
         /// <summary>
